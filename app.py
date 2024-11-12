@@ -5,8 +5,7 @@ from prophet import Prophet
 import matplotlib.pyplot as plt
 import streamlit as st
 import time
-from ta import add_all_ta_features
-from ta.utils import dropna
+from ta.utils import dropna  
 
 # Start timer
 start_time = time.time()
@@ -20,7 +19,7 @@ start_date = datetime.date(2019, 10, 8)
 end_date = datetime.date.today()
 
 # Input for stock symbol and prediction days
-stock_symbol = st.text_input("Enter Stock Symbol (Refer Yahoo Finance):")
+stock_symbol = st.text_input("Enter Stock Symbol (TICKER): ")
 days_to_predict = st.number_input("Days to Predict into the Future:", min_value=1, max_value=365, value=30)
 
 if stock_symbol:
@@ -41,12 +40,9 @@ if stock_symbol:
         else:
             st.success("Data Fetched Successfully!")
 
-            # Prepare data by removing NaN values and adding technical indicators
+            # Prepare data by removing NaN values
             data = dropna(data)
             data.reset_index(inplace=True)
-            data = add_all_ta_features(
-                data, open="Open", high="High", low="Low", close="Close", volume="Volume", fillna=True
-            )
 
             # Prepare data for Prophet
             data_prophet = data[['Date', 'Adj Close']].rename(columns={'Date': 'ds', 'Adj Close': 'y'})
