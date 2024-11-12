@@ -11,6 +11,7 @@ from ta.utils import dropna
 # Start timer
 start_time = time.time()
 
+# Set up the Streamlit interface
 st.title("Stock Price Prediction App")
 
 # Set the date range for the data
@@ -23,7 +24,6 @@ stock_symbol = st.text_input("Enter Stock Symbol (e.g., AAPL): ")
 # User input for how many days to predict into the future
 days_to_predict = st.number_input("Days to Predict into the Future:", min_value=1, max_value=365, value=30)
 
-# Display a loading spinner while the app fetches the data and does the computation
 if stock_symbol:
     if start_date > end_date:
         st.error("End Date cannot be earlier than Start Date!")
@@ -43,7 +43,7 @@ if stock_symbol:
             else:
                 st.success("Data Fetched Successfully!")
 
-                # Clean data
+                # Clean the data (removing any NaN values)
                 data = dropna(data)
                 data.reset_index(inplace=True)
 
@@ -55,9 +55,12 @@ if stock_symbol:
                 # Prepare data for Prophet model
                 data_prophet = data[['Date', 'Adj Close']].rename(columns={'Date': 'ds', 'Adj Close': 'y'})
 
-                # Ensure the 'ds' and 'y' columns are in the correct format
+                # Ensure the 'ds' column is in datetime format and 'y' is numeric
                 data_prophet['ds'] = pd.to_datetime(data_prophet['ds'])  # Ensure 'ds' is datetime
-                data_prophet['y'] = data_prophet['y'].astype(float)  # Ensure 'y' is numeric
+                data_prophet['y'] = pd.to_numeric(data_prophet['y'], errors='coerce')  # Ensure 'y' is numeric
+
+                # Drop rows where 'y' is NaN after conversion
+                data_prophet = data_prophet.dropna(subset=['y'])
 
                 # Initialize Prophet model and fit to the data
                 model = Prophet()
