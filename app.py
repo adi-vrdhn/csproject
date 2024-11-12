@@ -55,12 +55,16 @@ if stock_symbol:
                 # Prepare data for Prophet model
                 data_prophet = data[['Date', 'Adj Close']].rename(columns={'Date': 'ds', 'Adj Close': 'y'})
 
+                # Ensure the 'ds' and 'y' columns are in the correct format
+                data_prophet['ds'] = pd.to_datetime(data_prophet['ds'])  # Ensure 'ds' is datetime
+                data_prophet['y'] = data_prophet['y'].astype(float)  # Ensure 'y' is numeric
+
                 # Initialize Prophet model and fit to the data
                 model = Prophet()
                 model.fit(data_prophet)
 
                 # Make future date predictions
-                future_dates = model.make_future_dataframe(periods=days_to_predict)
+                future_dates = model.make_future_dataframe(data_prophet, periods=days_to_predict)
                 forecast = model.predict(future_dates)
 
                 # Plot the results
@@ -107,4 +111,3 @@ if stock_symbol:
                 end_time = time.time()
                 time_taken = end_time - start_time
                 st.write(f"Time taken to load the site and perform predictions: {time_taken:.2f} seconds")
-
