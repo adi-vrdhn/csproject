@@ -5,7 +5,7 @@ from prophet import Prophet
 import matplotlib.pyplot as plt
 import streamlit as st
 import time
-from ta.utils import dropna  
+from ta.utils import dropna
 
 # Start timer
 start_time = time.time()
@@ -19,7 +19,7 @@ start_date = datetime.date(2019, 10, 8)
 end_date = datetime.date.today()
 
 # Input for stock symbol and prediction days
-stock_symbol = st.text_input("Enter Stock Symbol (TICKER): ")
+stock_symbol = st.text_input("Enter Stock Symbol (e.g., AAPL): ")
 days_to_predict = st.number_input("Days to Predict into the Future:", min_value=1, max_value=365, value=30)
 
 if stock_symbol:
@@ -44,8 +44,19 @@ if stock_symbol:
             data = dropna(data)
             data.reset_index(inplace=True)
 
+            # Check data structure
+            st.write("Data preview:", data.head())
+
             # Prepare data for Prophet
             data_prophet = data[['Date', 'Adj Close']].rename(columns={'Date': 'ds', 'Adj Close': 'y'})
+
+            # Drop rows with missing values in the 'y' column
+            data_prophet.dropna(subset=['y'], inplace=True)
+
+            # Verify if data is in correct format
+            if data_prophet['y'].empty:
+                st.error("Data for prediction is missing or invalid. Please check the stock symbol or date range.")
+                st.stop()
 
             # Train Prophet model
             model = Prophet()
