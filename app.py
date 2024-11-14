@@ -64,22 +64,26 @@ def plot_predictions(data, train_predict, test_predict, time_step, scaler):
     plt.figure(figsize=(10, 5))
     plt.plot(data['Date'], data['Adj Close'], label='Actual Data', color='black')
 
-    train_predict_plot = np.empty_like(scaler.inverse_transform(train_predict))
+    # Initialize arrays with NaNs to hold predictions for plotting
+    train_predict_plot = np.empty((len(data), 1))
     train_predict_plot[:, :] = np.nan
     train_predict_plot[time_step:len(train_predict) + time_step, :] = train_predict
 
-    test_predict_plot = np.empty_like(scaler.inverse_transform(test_predict))
+    test_predict_plot = np.empty((len(data), 1))
     test_predict_plot[:, :] = np.nan
-    test_predict_plot[len(train_predict) + (time_step * 2) + 1:len(scaler.inverse_transform(test_predict)) - 1, :] = test_predict
+    test_predict_plot[len(train_predict) + (time_step * 2) + 1:len(data) - 1, :] = test_predict
 
-    plt.plot(data['Date'][:len(train_predict_plot)], train_predict_plot, label='Train Prediction', color='blue')
-    plt.plot(data['Date'][len(train_predict_plot):], test_predict_plot, label='Test Prediction', color='red')
+    # Plotting predictions
+    plt.plot(data['Date'], train_predict_plot, label='Train Prediction', color='blue')
+    plt.plot(data['Date'], test_predict_plot, label='Test Prediction', color='red')
 
     plt.title(f"Stock Price Prediction for {stock_symbol.upper()}")
     plt.xlabel("Date")
     plt.ylabel("Stock Price")
     plt.legend(loc='upper left')
     plt.xticks(rotation=45)
+    
+    # Display the plot in Streamlit
     st.pyplot(plt)
 
 # Function to make future predictions
