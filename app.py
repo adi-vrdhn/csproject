@@ -15,9 +15,11 @@ st.title("Stock Price Prediction App")
 start_date = datetime.date(2019, 10, 8)
 end_date = datetime.date.today()
 
-# User inputs for stock symbol and prediction days
+# User inputs for stock symbol
 stock_symbol = st.text_input("Enter Stock Symbol (e.g., STOCKNAME.NS): ")
-days_to_predict = st.number_input("Days to Predict into the Future:", min_value=1, max_value=365, value=30)
+
+# Days to predict into the future
+days_to_predict = 365
 
 # Function to fetch data
 def fetch_data(symbol, start, end):
@@ -133,11 +135,11 @@ if stock_symbol:
             st.write("Historical Data:")
             st.dataframe(data)
 
-            # Predict future stock prices
+            # Predict future stock prices for 365 days
             future_predictions = predict_future(model, scaled_data, scaler, days_to_predict)
             future_dates = pd.date_range(start=end_date, periods=days_to_predict + 1).tolist()
             forecast_table = pd.DataFrame(future_predictions, columns=['Predicted Price'])
             forecast_table['Date'] = future_dates[1:]  # Exclude the end_date
 
-            st.write("Future Forecast:")
+            st.write("Future Forecast for 365 Days:")
             st.dataframe(forecast_table)
