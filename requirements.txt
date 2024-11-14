@@ -6,3 +6,4 @@ keras
 matplotlib
 streamlit
 tensorflow
+setuptools
